@@ -19,8 +19,7 @@ class TestAuthAndRecovery:
         main_page = MainPage(browser)
         auth_page = AuthPage(browser)
 
-        with allure.step("Открыть главную страницу"):
-            main_page.open()
+        main_page.open()
 
         with allure.step("Кликнуть на кнопку Личный кабинет"):
             main_page.click_personal_account_when_clickable()

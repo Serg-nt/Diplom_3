@@ -14,8 +14,7 @@ class TestMainFunctionality:
     def test_navigation(self, browser, test_data):
         main_page = MainPage(browser)
 
-        with allure.step("Открыть главную страницу"):
-            main_page.open()
+        main_page.open()
 
         with allure.step(test_data["step_name"]):
             click_method = getattr(main_page, test_data["click_method"])
@@ -36,8 +35,7 @@ class TestMainFunctionality:
         """
         main_page = MainPage(browser)
 
-        with allure.step("Открыть главную страницу"):
-            main_page.open()
+        main_page.open()
 
         with allure.step("Кликнуть на ингридиент"):
             main_page.click_ingredient_when_clickable()
@@ -104,8 +102,7 @@ class TestMainFunctionality:
         """
         main_page = MainPage(browser)
 
-        with allure.step("Открыть главную страницу"):
-            main_page.open()
+        main_page.open()
 
         with allure.step("Кликнуть на ингридиент"):
             main_page.click_ingredient_when_clickable()

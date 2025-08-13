@@ -1,9 +1,10 @@
-import time
 
-from selenium.common import TimeoutException
+from selenium.common import TimeoutException, ElementClickInterceptedException
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as es
 import allure
+
+from ..locators.main_page_locators import MainPageLocators
 
 
 class BasePage:
@@ -21,8 +22,6 @@ class BasePage:
 
     @allure.step("Ожидание кликабельности элемента {locator}")
     def wait_for_element_clickable(self, locator):
-        """Time.sleep используется потому что WebDriverWait не всегда корректно срабатывает"""
-        time.sleep(1)
         self.wait.until(es.visibility_of_element_located(locator))
         return self.wait.until(es.element_to_be_clickable(locator))
 
@@ -45,7 +44,22 @@ class BasePage:
 
     @allure.step("Клик по элементу {locator}")
     def click_element(self, locator):
-        self.wait_for_element_clickable(locator).click()
+        try:
+            self.wait_for_element_clickable(locator).click()
+        except ElementClickInterceptedException as e:
+            if "Modal_modal_overlay__x2ZCr" not in str(e):
+                raise
+
+            self._wait_until_overlay_disappears(MainPageLocators.OVERLAY_LOCATOR)
+            self.wait_for_element_clickable(locator).click()
+
+    def _wait_until_overlay_disappears(self, overlay_locator):
+        try:
+            WebDriverWait(self.driver, 5).until_not(
+                es.visibility_of_element_located(overlay_locator)
+            )
+        except TimeoutException:
+            pass
 
     @allure.step("Ввод текста '{text}' в элемент {locator}")
     def send_keys_to_element(self, locator, text):
@@ -69,7 +83,6 @@ class BasePage:
 
     @allure.step("Ожидание видимости элемента {locator}")
     def wait_for_element_visible(self, locator, timeout=10):
-        """Ожидает видимость элемента с указанным таймаутом"""
         return WebDriverWait(self.driver, timeout).until(
             es.visibility_of_element_located(locator),
             message=f"Элемент {locator} не стал видимым за {timeout} секунд"
@@ -77,7 +90,6 @@ class BasePage:
 
     @allure.step("Проверить видимость элемента {locator}")
     def is_visible(self, locator, timeout=10) -> bool:
-        """Проверяет, что элемент видим на странице"""
         try:
             self.wait_for_element_visible(locator, timeout)
             return True
@@ -109,3 +121,10 @@ class BasePage:
             evt.initMouseEvent("dragend", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
             source.dispatchEvent(evt);
             """, element_from, element_to)
+
+    @allure.step("Ожидание условия с таймаутом")
+    def wait_for_condition(self, condition, timeout=10, message=""):
+        return WebDriverWait(self.driver, timeout).until(
+            condition,
+            message=message if message else f"Условие не выполнено за {timeout} секунд"
+        )

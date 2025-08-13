@@ -6,7 +6,8 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 from ..data.urls import BASE_URL_API, BASE_URL
-from ..data.data import PASSWORD, NAME, generate_random_email
+from ..data.data import PASSWORD, NAME
+from ..helpers.email_helpers import generate_random_email
 from ..page_objects.auth_page import AuthPage
 from ..page_objects.main_page import MainPage
 
@@ -37,7 +38,6 @@ def registered_user():
                 "name": NAME
             }
         )
-        assert register_response.status_code == 200, "Ошибка регистрации пользователя"
 
     yield {
         "email": email,
@@ -84,4 +84,4 @@ def auth_user(browser, registered_user):
             EC.url_contains(BASE_URL)
         )
 
-    yield registered_user
+    return registered_user

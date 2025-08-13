@@ -2,7 +2,6 @@ import time
 
 import allure
 from selenium.common import TimeoutException
-from selenium.webdriver.support.wait import WebDriverWait
 
 from ..data.urls import BASE_URL
 from .base_page import BasePage
@@ -45,32 +44,28 @@ class MainPage(BasePage):
         """Ожидает появления модального окна с деталями ингредиента"""
         self.wait_for_element_visible(MainPageLocators.MODAL_INGREDIENT_WINDOW)
         self.wait_for_element_visible(MainPageLocators.MODAL_INGREDIENT_TITLE)
-        return self
 
     @allure.step("Дождаться отображения модального окна заказа")
     def wait_for_order_modal_visible(self):
         """Ожидает появления модального окна оформления заказа"""
         self.wait_for_element_visible(MainPageLocators.MODAL_ORDER_WINDOW)
         self.wait_for_element_visible(MainPageLocators.MODAL_ORDER_TEXT)
-        WebDriverWait(self.driver, 10).until(
-            lambda driver: self.get_element_text(MainPageLocators.MODAL_ORDER_NUMBER_H2) != "9999",
+        self.wait_for_condition(
+            lambda d: self.get_element_text(MainPageLocators.MODAL_ORDER_NUMBER_H2) != "9999",
             message="Номер заказа не изменился"
         )
-        return self
 
     @allure.step("Закрыть модальное окно ингридиента")
     def close_ingredient_modal(self):
         """Закрывает модальное окно с деталями ингредиента"""
         self.click_element(MainPageLocators.MODAL_INGREDIENT_CLOSE_BTN)
         self.wait_for_element_invisible(MainPageLocators.MODAL_INGREDIENT_WINDOW)
-        return self
 
     @allure.step("Закрыть модальное окно заказа")
     def close_order_modal(self):
         """Закрывает модальное окно заказа"""
         self.click_element(MainPageLocators.MODAL_ORDER_CLOSE_BTN)
         self.wait_for_element_invisible(MainPageLocators.MODAL_ORDER_WINDOW)
-        return self
 
     @allure.step("Проверить что модальное окно ингредиента невидимо")
     def is_ingredient_modal_invisible(self, timeout=3):
@@ -111,8 +106,7 @@ class MainPage(BasePage):
 
     @allure.step("Получить номер заказа в работе")
     def get_number_order_value_in_progress(self):
-        # пауза необходима для отображения заказа
-        time.sleep(1)
+        self.wait_for_element_visible(MainPageLocators.ORDER_NUMBER_IN_PROGRESS)
         return self.get_element_text(MainPageLocators.ORDER_NUMBER_IN_PROGRESS)
 
     @allure.step("Получить номер заказа из ленты заказов")

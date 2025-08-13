@@ -27,3 +27,4 @@ class MainPageLocators:
     ORDER_NUMBER_IN_PROGRESS = (By.CSS_SELECTOR,
                                 "ul.OrderFeed_orderListReady__1YFem li.text.text_type_digits-default")
     FIRST_ORDER_NUMBER = (By.XPATH, "(//p[@class='text text_type_digits-default'])[1]")
+    OVERLAY_LOCATOR = (By.CLASS_NAME, "Modal_modal_overlay__x2ZCr")
